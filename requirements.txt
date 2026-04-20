@@ -7,7 +7,7 @@ fastmcp
 chromadb>=0.4.0
 
 # Phase 2: Chonkie Integration (intelligent chunking)
-chonkie[all]>=1.6.0  # Includes all optional dependencies for full functionality
+chonkie[semantic,table]>=1.6.0  # Includes all optional dependencies for full functionality
 
 # HTML to Markdown conversion (pre-chunking)
 html2text>=2024.2.26
