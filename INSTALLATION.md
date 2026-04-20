@@ -1,6 +1,6 @@
 # Librarian MCP — Installation & Setup Guide
 
-**Last Updated:** 2026-04-13
+**Last Updated:** 2026-04-20
 **Audience:** Anyone setting up the Librarian MCP system
 
 ---
@@ -11,10 +11,11 @@
 2. [Server Installation](#server-installation)
 3. [Starting the Server](#starting-the-server)
 4. [MCP Client Configuration](#mcp-client-configuration)
-5. [Creating Your First Library](#creating-your-first-library)
-6. [Managing Libraries](#managing-libraries)
-7. [Directory Structure](#directory-structure)
-8. [Troubleshooting](#troubleshooting)
+5. [Getting the Demo Libraries Running](#getting-the-demo-libraries-running)
+6. [Creating Your First Library](#creating-your-first-library)
+7. [Managing Libraries](#managing-libraries)
+8. [Directory Structure](#directory-structure)
+9. [Troubleshooting](#troubleshooting)
 
 ---
 
@@ -209,11 +210,42 @@ The Librarian uses standard HTTP MCP transport. Any MCP-compatible client should
 **See documents/clients for information on more clients and different configurations including remote access**
 ---
 
+## Getting the Demo Libraries Running
+
+The system ships with no libraries registered. Two sample libraries are included in the repo for you to explore:
+
+1. **The project source itself** — all the code, documentation, and configuration you just cloned
+2. **Sample medical library** — a small demonstration library at `examples/sample-library/`
+
+To register them, ask your AI:
+
+> "Add library `/path/to/your/librarian-mcp` called librarian-mcp."
+
+> "Add library `/path/to/your/librarian-mcp/examples/sample-library` called sample-library."
+
+Replace `/path/to/your/` with the actual path where you cloned the repo. Then verify:
+
+> "List libraries."
+
+> "Get library stats for both libraries."
+
+You should see both libraries with documents and chunks indexed. You're ready to explore.
+
+### What `add_library` Does
+
+The `add_library` command:
+1. Creates a `.librarian/` directory inside the target folder (ChromaDB, metadata, config)
+2. Creates a `.librarianignore` file with sensible defaults (`.env`, `*.key`, `venv/`, etc.)
+3. Registers the library in the system registry
+4. Triggers an initial sync that indexes all supported files
+
+Source documents are never modified or copied. The `.librarian/` directory holds only index data.
+
 ## Creating Your First Library
 
-Once your client is connected, ask your AI to register a library:
+Once your client is connected, ask your AI to add a library:
 
-> "Register the directory `/path/to/your/documents` as a library called my-library."
+> add_library  `/path/to/your/documents`  called my-library."
 
 The AI will:
 1. Create the `.librarian/` directory structure inside your document folder

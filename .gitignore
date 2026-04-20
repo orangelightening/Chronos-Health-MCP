@@ -104,3 +104,6 @@ CLAUDE.md
 # internal library data
 .librarian/
 
+# Library registry (machine-specific, created by add_library)
+global_control/.library_control/libraries.yaml
+
