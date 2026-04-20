@@ -1,0 +1,176 @@
+# ============================================================================
+# Librarian MCP - Global Configuration
+# ============================================================================
+# This file contains global system settings for the Librarian MCP server.
+# Library-specific settings are stored in each library's .librarian/config.yaml
+#
+# Settings can be overridden by environment variables (see env_var comments)
+
+# ============================================================================
+# BACKEND CONFIGURATION
+# ============================================================================
+backend:
+  # Backend type: 'chonkie' for Chonkie Pipeline API
+  # ENV: LIBRARIAN_BACKEND
+  type: chonkie
+
+  # Chonkie API endpoint
+  # ENV: LIBRARIAN_CHONKIE_URL
+  url: http://localhost:8000
+
+# ============================================================================
+# CHUNKING CONFIGURATION
+# ============================================================================
+chunking:
+  # Default chunk size for semantic chunking
+  # ENV: LIBRARIAN_CHUNK_SIZE
+  chunk_size: 1000
+
+  # File-type specific chunking strategies
+  strategies:
+    markdown:
+      processor: markdown
+      chunker: semantic
+      chunk_size: 1000
+
+    code:
+      processor: text
+      chunker: code
+      chunk_size: 1000
+      # Code file extensions
+      extensions: ['.py', '.js', '.ts', '.sh', '.bash', '.zsh']
+
+    text:
+      processor: text
+      chunker: semantic
+      chunk_size: 1000
+
+# ============================================================================
+# FILE TYPE CONFIGURATION
+# ============================================================================
+file_types:
+  # Default allowed file extensions for indexing
+  # ENV: LIBRARIAN_DEFAULT_EXTENSIONS
+  allowed:
+    # Text files
+    - .md
+    - .txt
+    - .rst
+    - .log
+
+    # Shell scripts
+    - .sh
+    - .bash
+    - .zsh
+
+    # Code files
+    - .py
+    - .js
+    - .ts
+    - .json
+
+    # Config files
+    - .yaml
+    - .yml
+    - .toml
+
+    # Web files
+    - .html
+    - .css
+    - .scss
+
+    # Data files
+    - .csv
+    - .tsv
+
+  # Maximum document size for indexing (bytes)
+  # ENV: LIBRARIAN_MAX_DOCUMENT_SIZE
+  max_document_size: 10000000  # 10MB
+
+# ============================================================================
+# LIBRARY REGISTRY
+# ============================================================================
+library_registry:
+  # Path to libraries.yaml registry
+  # ENV: LIBRARIAN_REGISTRY_PATH
+  path: /home/peter/.librarian-mcp/.library_control/libraries.yaml
+
+# ============================================================================
+# SECURITY CONFIGURATION
+# ============================================================================
+security:
+  # Maximum output characters for tool responses
+  # ENV: LIBRARIAN_MAX_OUTPUT_CHARS
+  max_output_chars: 8000
+
+  # Command timeout (seconds)
+  # ENV: LIBRARIAN_COMMAND_TIMEOUT
+  command_timeout: 15
+
+# ============================================================================
+# LOGGING CONFIGURATION
+# ============================================================================
+logging:
+  # Log level: DEBUG, INFO, WARNING, ERROR, CRITICAL
+  # ENV: LIBRARIAN_LOG_LEVEL
+  level: INFO
+
+  # Log file location (per-library logs in .librarian/sync_worker.log)
+  # Global logging goes to stdout/stderr
+  to_file: true
+
+# ============================================================================
+# PERFORMANCE CONFIGURATION
+# ============================================================================
+performance:
+  # Enable parallel processing for indexing
+  # ENV: LIBRARIAN_PARALLEL_INDEXING
+  parallel_indexing: false
+
+  # Number of workers for parallel indexing (if enabled)
+  # ENV: LIBRARIAN_INDEXING_WORKERS
+  indexing_workers: 4
+
+# ============================================================================
+# ASYNC OPERATIONS
+# ============================================================================
+async:
+  # Enable background processing for long-running operations
+  # ENV: LIBRARIAN_ASYNC_ENABLED
+  enabled: true
+
+  # Sync worker script path
+  worker_script: scripts/sync_worker.py
+
+  # Progress tracking file name
+  progress_file: sync_progress.json
+
+  # Results file name
+  results_file: sync_results.json
+
+# ============================================================================
+# DELIVERY SANDBOX
+# ============================================================================
+delivery:
+  # Directory name for report delivery sandbox
+  # ENV: LIBRARIAN_DELIVERY_DIR
+  directory_name: .librarian_delivery
+
+  # Maximum file size for delivered reports (bytes)
+  # ENV: LIBRARIAN_MAX_DELIVERY_SIZE
+  max_file_size: 10485760  # 10MB
+
+  # Secure permissions for delivered files
+  # ENV: LIBRARIAN_DELIVERY_PERMISSIONS
+  file_permissions: '0600'
+  dir_permissions: '0700'
+
+# ============================================================================
+# VERSION INFORMATION
+# ============================================================================
+version:
+  # Configuration file version
+  config_version: "1.0.0"
+
+  # Minimum librarian-mcp version for this config
+  min_version: "2.0.0"

@@ -1,0 +1,1211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>System Reference — Librarian MCP</title>
+    <style>
+        /* ── Reset & Base ──────────────────────────────────────── */
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --navy:    #1a1a2e;
+            --slate:   #16213e;
+            --teal:    #0f3460;
+            --accent:  #4cc9f0;
+            --accent2: #7b2cbf;
+            --green:   #06d6a0;
+            --orange:  #f4a261;
+            --red:     #e63946;
+            --gray-50:  #f8f9fa;
+            --gray-100: #e9ecef;
+            --gray-200: #dee2e6;
+            --gray-300: #ced4da;
+            --gray-500: #adb5bd;
+            --gray-700: #495057;
+            --gray-900: #212529;
+        }
+
+        html { scroll-behavior: smooth; }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            line-height: 1.7;
+            color: var(--gray-900);
+            background: var(--gray-50);
+        }
+
+        /* ── Layout ────────────────────────────────────────────── */
+        .layout {
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            max-width: 1400px;
+            margin: 0 auto;
+            min-height: 100vh;
+        }
+
+        /* ── Sidebar Nav ───────────────────────────────────────── */
+        .sidebar {
+            background: var(--navy);
+            color: white;
+            padding: 2rem 1.5rem;
+            position: sticky;
+            top: 0;
+            height: 100vh;
+            overflow-y: auto;
+        }
+
+        .sidebar h2 {
+            font-size: 1.1rem;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            color: var(--accent);
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 1px solid var(--teal);
+        }
+
+        .sidebar ul { list-style: none; }
+
+        .sidebar li {
+            margin-bottom: 0.35rem;
+        }
+
+        .sidebar a {
+            color: var(--gray-300);
+            text-decoration: none;
+            font-size: 0.88rem;
+            display: block;
+            padding: 0.35rem 0.75rem;
+            border-radius: 4px;
+            border-left: 3px solid transparent;
+            transition: all 0.15s ease;
+        }
+
+        .sidebar a:hover,
+        .sidebar a:focus {
+            color: white;
+            background: var(--slate);
+            border-left-color: var(--accent);
+        }
+
+        .sidebar .version-badge {
+            display: inline-block;
+            background: var(--teal);
+            color: var(--accent);
+            font-size: 0.7rem;
+            padding: 0.15rem 0.5rem;
+            border-radius: 3px;
+            font-family: monospace;
+            margin-top: 1.5rem;
+        }
+
+        /* ── Main Content ──────────────────────────────────────── */
+        .content {
+            padding: 2.5rem 3.5rem;
+            max-width: 900px;
+        }
+
+        h1 {
+            font-size: 2.2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            color: var(--navy);
+        }
+
+        h1 + .subtitle {
+            font-size: 1rem;
+            color: var(--gray-500);
+            margin-bottom: 2rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 2px solid var(--gray-200);
+        }
+
+        h2 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-top: 3rem;
+            margin-bottom: 1rem;
+            color: var(--navy);
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid var(--gray-200);
+        }
+
+        h3 {
+            font-size: 1.15rem;
+            font-weight: 600;
+            margin-top: 1.75rem;
+            margin-bottom: 0.75rem;
+            color: var(--slate);
+        }
+
+        h4 {
+            font-size: 1rem;
+            font-weight: 600;
+            margin-top: 1.25rem;
+            margin-bottom: 0.5rem;
+            color: var(--gray-700);
+        }
+
+        p { margin-bottom: 1rem; }
+
+        ul, ol { margin-bottom: 1rem; padding-left: 1.5rem; }
+        li { margin-bottom: 0.3rem; }
+
+        strong { color: var(--navy); }
+
+        /* ── Code ───────────────────────────────────────────────── */
+        code {
+            font-family: 'Fira Code', 'Cascadia Code', 'Consolas', monospace;
+            font-size: 0.88rem;
+        }
+
+        p code, li code {
+            background: var(--gray-100);
+            padding: 0.15rem 0.4rem;
+            border-radius: 3px;
+            color: var(--accent2);
+        }
+
+        pre {
+            background: var(--navy);
+            color: #e0e0e0;
+            padding: 1.25rem 1.5rem;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin-bottom: 1.25rem;
+            font-size: 0.85rem;
+            line-height: 1.6;
+            border: 1px solid var(--teal);
+        }
+
+        pre code {
+            background: none;
+            padding: 0;
+            color: inherit;
+        }
+
+        .comment  { color: #6a9955; }
+        .keyword  { color: #569cd6; }
+        .string   { color: #ce9178; }
+        .function { color: #dcdcaa; }
+        .type     { color: #4ec9b0; }
+        .arrow    { color: var(--accent); font-weight: bold; }
+        .pipe     { color: var(--gray-500); }
+
+        /* ── Tables ─────────────────────────────────────────────── */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 1.5rem;
+            font-size: 0.92rem;
+        }
+
+        th {
+            background: var(--navy);
+            color: white;
+            font-weight: 600;
+            text-align: left;
+            padding: 0.65rem 1rem;
+        }
+
+        th:first-child { border-radius: 6px 0 0 0; }
+        th:last-child  { border-radius: 0 6px 0 0; }
+
+        td {
+            padding: 0.55rem 1rem;
+            border-bottom: 1px solid var(--gray-200);
+        }
+
+        tr:nth-child(even) { background: var(--gray-50); }
+        tr:hover { background: #e3f2fd; }
+
+        /* ── Badges ─────────────────────────────────────────────── */
+        .badge {
+            display: inline-block;
+            padding: 0.2rem 0.6rem;
+            border-radius: 4px;
+            font-size: 0.78rem;
+            font-weight: 600;
+            letter-spacing: 0.02em;
+        }
+
+        .badge-blue    { background: #dbeafe; color: #1d4ed8; }
+        .badge-green   { background: #d1fae5; color: #065f46; }
+        .badge-purple  { background: #ede9fe; color: #5b21b6; }
+        .badge-orange  { background: #ffedd5; color: #9a3412; }
+        .badge-red     { background: #fee2e2; color: #991b1b; }
+        .badge-gray    { background: var(--gray-100); color: var(--gray-700); }
+
+        /* ── Cards ──────────────────────────────────────────────── */
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .card {
+            background: white;
+            border: 1px solid var(--gray-200);
+            border-radius: 8px;
+            padding: 1.25rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+        }
+
+        .card h4 {
+            margin-top: 0;
+            color: var(--teal);
+            font-size: 0.95rem;
+        }
+
+        .card .value {
+            font-size: 1.6rem;
+            font-weight: 700;
+            color: var(--navy);
+        }
+
+        .card p {
+            font-size: 0.88rem;
+            color: var(--gray-700);
+            margin-bottom: 0;
+        }
+
+        /* ── Diagrams ───────────────────────────────────────────── */
+        .diagram {
+            background: white;
+            border: 1px solid var(--gray-200);
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+            overflow-x: auto;
+        }
+
+        .diagram-caption {
+            text-align: center;
+            font-size: 0.85rem;
+            color: var(--gray-700);
+            margin-top: 0.75rem;
+            font-style: italic;
+        }
+
+        .flow-box {
+            display: inline-block;
+            background: var(--gray-100);
+            border: 2px solid var(--gray-300);
+            border-radius: 6px;
+            padding: 0.4rem 0.8rem;
+            font-size: 0.85rem;
+            font-family: monospace;
+            margin: 0.2rem;
+        }
+
+        .flow-box-core {
+            background: #dbeafe;
+            border-color: #93c5fd;
+            color: #1e40af;
+        }
+
+        .flow-box-backend {
+            background: #ede9fe;
+            border-color: #c4b5fd;
+            color: #5b21b6;
+        }
+
+        .flow-box-storage {
+            background: #d1fae5;
+            border-color: #6ee7b7;
+            color: #065f46;
+        }
+
+        .flow-arrow {
+            display: block;
+            text-align: center;
+            color: var(--teal);
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin: 0.3rem 0;
+        }
+
+        /* ── Tool Reference ─────────────────────────────────────── */
+        .tool-entry {
+            background: white;
+            border: 1px solid var(--gray-200);
+            border-radius: 8px;
+            padding: 1.25rem 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .tool-entry h4 {
+            margin-top: 0;
+            margin-bottom: 0.5rem;
+            font-family: monospace;
+            color: var(--teal);
+        }
+
+        .tool-entry p {
+            font-size: 0.92rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .tool-entry p:last-child { margin-bottom: 0; }
+
+        /* ── Security Layer ─────────────────────────────────────── */
+        .security-layer {
+            display: flex;
+            align-items: stretch;
+            margin-bottom: 0.75rem;
+        }
+
+        .layer-number {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 48px;
+            min-height: 60px;
+            background: var(--navy);
+            color: var(--accent);
+            font-weight: 700;
+            font-size: 1.1rem;
+            border-radius: 6px 0 0 6px;
+            flex-shrink: 0;
+        }
+
+        .layer-content {
+            background: white;
+            border: 1px solid var(--gray-200);
+            border-left: none;
+            border-radius: 0 6px 6px 0;
+            padding: 0.75rem 1.25rem;
+            flex-grow: 1;
+        }
+
+        .layer-content strong {
+            display: block;
+            color: var(--navy);
+            margin-bottom: 0.2rem;
+        }
+
+        .layer-content p {
+            font-size: 0.88rem;
+            margin-bottom: 0;
+            color: var(--gray-700);
+        }
+
+        /* ── File Tree ──────────────────────────────────────────── */
+        .file-tree {
+            font-family: 'Fira Code', 'Cascadia Code', monospace;
+            font-size: 0.85rem;
+            background: white;
+            border: 1px solid var(--gray-200);
+            border-radius: 8px;
+            padding: 1.25rem 1.5rem;
+            margin-bottom: 1.5rem;
+            line-height: 1.8;
+        }
+
+        .file-tree .dir  { color: var(--teal); font-weight: 600; }
+        .file-tree .file { color: var(--gray-700); }
+        .file-tree .comment { color: var(--gray-500); font-style: italic; }
+        .file-tree .dead { color: var(--red); text-decoration: line-through; }
+
+        /* ── Print ──────────────────────────────────────────────── */
+        @media print {
+            .sidebar { display: none; }
+            .layout { grid-template-columns: 1fr; }
+            .content { padding: 1rem; }
+            pre { break-inside: avoid; }
+        }
+
+        @media (max-width: 900px) {
+            .layout { grid-template-columns: 1fr; }
+            .sidebar {
+                position: relative;
+                height: auto;
+                padding: 1.5rem;
+            }
+            .content { padding: 1.5rem; }
+        }
+    </style>
+</head>
+<body>
+<div class="layout">
+
+    <!-- ════════════════════════════════════════════════════════════ -->
+    <!--  SIDEBAR NAVIGATION                                        -->
+    <!-- ════════════════════════════════════════════════════════════ -->
+    <nav class="sidebar">
+        <h2>📑 System Reference</h2>
+        <ul>
+            <li><a href="#overview">1. Overview</a></li>
+            <li><a href="#architecture">2. Architecture</a></li>
+            <li><a href="#lifecycle">3. Request Lifecycle</a></li>
+            <li><a href="#source-code">4. Source Code Reference</a></li>
+            <li><a href="#scripts">5. Scripts</a></li>
+            <li><a href="#configuration">6. Configuration</a></li>
+            <li><a href="#library-structure">7. Library Structure</a></li>
+            <li><a href="#multi-mode">8. Multi-Mode Operation</a></li>
+            <li><a href="#tools">9. Tool Reference</a></li>
+            <li><a href="#data-flow">10. Data Flow</a></li>
+            <li><a href="#security">11. Security</a></li>
+            <li><a href="#file-inventory">12. File Inventory</a></li>
+        </ul>
+        <span class="version-badge">v1.0 · Blue Sky · MIT</span>
+    </nav>
+
+    <!-- ════════════════════════════════════════════════════════════ -->
+    <!--  MAIN CONTENT                                              -->
+    <!-- ════════════════════════════════════════════════════════════ -->
+    <main class="content">
+
+        <h1>System Reference — Librarian MCP</h1>
+        <p class="subtitle">
+            <strong>Version:</strong> 1.0 (Blue Sky)&nbsp;&nbsp;·&nbsp;&nbsp;
+            <strong>Generated:</strong> 2026-04-20&nbsp;&nbsp;·&nbsp;&nbsp;
+            <strong>Source:</strong> Direct reading of source code&nbsp;&nbsp;·&nbsp;&nbsp;
+            <strong>Purpose:</strong> Authoritative system description
+        </p>
+
+        <!-- ──────────────────────────────────────────────────────── -->
+        <!--  §1  Overview                                           -->
+        <!-- ──────────────────────────────────────────────────────── -->
+        <h2 id="overview">1. Overview</h2>
+
+        <p>
+            <strong>Librarian MCP Server</strong> — a Model Context Protocol (MCP) server providing AI models
+            with semantic document search across multiple independent libraries.
+            Fully local, CPU-based, no cloud dependencies.
+        </p>
+
+        <div class="card-grid">
+            <div class="card">
+                <h4>Architecture</h4>
+                <p>Blue Sky — in-place indexing, per-library ChromaDB, no shadow copies</p>
+            </div>
+            <div class="card">
+                <h4>Language</h4>
+                <div class="value">Python 3.13</div>
+                <p>MIT License</p>
+            </div>
+            <div class="card">
+                <h4>MCP Framework</h4>
+                <div class="value">FastMCP</div>
+                <p>stdio &amp; HTTP transports</p>
+            </div>
+            <div class="card">
+                <h4>Vector DB</h4>
+                <p>ChromaDB — per-library instances in <code>.librarian/chromadb/</code></p>
+            </div>
+        </div>
+
+        <table>
+            <thead>
+                <tr><th>Component</th><th>Technology</th><th>Purpose</th></tr>
+            </thead>
+            <tbody>
+                <tr><td>Chunking</td><td>Chonkie SemanticChunker</td><td>Semantic text splitting for all file types</td></tr>
+                <tr><td>Chunking Embeddings</td><td>minishlab/potion-base-32M</td><td>Chunk boundary decisions (cached locally)</td></tr>
+                <tr><td>Search Embeddings</td><td>BAAI/bge-small-en-v1.5</td><td>Similarity vector generation (ChromaDB default)</td></tr>
+                <tr><td>HTML Conversion</td><td>html2text</td><td>HTML → Markdown pre-chunking</td></tr>
+                <tr><td>Configuration</td><td>YAML</td><td>Library configs and registry</td></tr>
+                <tr><td>Change Detection</td><td>SHA-256</td><td>Incremental sync</td></tr>
+            </tbody>
+        </table>
+
+        <!-- ──────────────────────────────────────────────────────── -->
+        <!--  §2  Architecture                                        -->
+        <!-- ──────────────────────────────────────────────────────── -->
+        <h2 id="architecture">2. Architecture Diagram</h2>
+
+        <div class="diagram">
+            <svg viewBox="0 0 800 520" xmlns="http://www.w3.org/2000/svg" style="width:100%;">
+                <!-- Background -->
+                <rect x="0" y="0" width="800" height="520" fill="#fafafa" rx="8"/>
+
+                <!-- MCP Client -->
+                <rect x="240" y="15" width="320" height="55" rx="8" fill="#1a1a2e" stroke="#0f3460" stroke-width="2"/>
+                <text x="400" y="38" text-anchor="middle" fill="#4cc9f0" font-size="13" font-weight="bold">AI Model Chat Window</text>
+                <text x="400" y="56" text-anchor="middle" fill="#ced4da" font-size="11">(MCP Client: Jan / LM Studio)</text>
+
+                <!-- Arrow down -->
+                <line x1="400" y1="70" x2="400" y2="100" stroke="#4cc9f0" stroke-width="2" marker-end="url(#arrowhead)"/>
+
+                <!-- Multi-Mode Box -->
+                <rect x="40" y="100" width="720" height="320" rx="10" fill="white" stroke="#dee2e6" stroke-width="2"/>
+                <text x="400" y="122" text-anchor="middle" fill="#1a1a2e" font-size="13" font-weight="bold">Multi-Mode Librarian MCP Servers (3 Separate Processes)</text>
+
+                <!-- Three mode boxes -->
+                <rect x="80" y="135" width="180" height="55" rx="6" fill="#dbeafe" stroke="#93c5fd" stroke-width="1.5"/>
+                <text x="170" y="156" text-anchor="middle" fill="#1e40af" font-size="12" font-weight="bold">LibraryManager</text>
+                <text x="170" y="174" text-anchor="middle" fill="#3b82f6" font-size="10">Port 8889 · 18 tools</text>
+
+                <rect x="310" y="135" width="180" height="55" rx="6" fill="#d1fae5" stroke="#6ee7b7" stroke-width="1.5"/>
+                <text x="400" y="156" text-anchor="middle" fill="#065f46" font-size="12" font-weight="bold">LibraryUser</text>
+                <text x="400" y="174" text-anchor="middle" fill="#10b981" font-size="10">Port 8890 · 14 tools</text>
+
+                <rect x="540" y="135" width="180" height="55" rx="6" fill="#ede9fe" stroke="#c4b5fd" stroke-width="1.5"/>
+                <text x="630" y="156" text-anchor="middle" fill="#5b21b6" font-size="12" font-weight="bold">Admin</text>
+                <text x="630" y="174" text-anchor="middle" fill="#7c3aed" font-size="10">Port 8891 · All tools</text>
+
+                <!-- Lines down to core -->
+                <line x1="170" y1="190" x2="170" y2="210" stroke="#93c5fd" stroke-width="1.5"/>
+                <line x1="400" y1="190" x2="400" y2="210" stroke="#6ee7b7" stroke-width="1.5"/>
+                <line x1="630" y1="190" x2="630" y2="210" stroke="#c4b5fd" stroke-width="1.5"/>
+                <line x1="170" y1="210" x2="630" y2="210" stroke="#adb5bd" stroke-width="1.5"/>
+                <line x1="400" y1="210" x2="400" y2="225" stroke="#adb5bd" stroke-width="2" marker-end="url(#arrowhead)"/>
+
+                <!-- Core Business Logic -->
+                <rect x="80" y="225" width="640" height="95" rx="6" fill="#f0f7ff" stroke="#93c5fd" stroke-width="1.5"/>
+                <text x="400" y="244" text-anchor="middle" fill="#1a1a2e" font-size="12" font-weight="bold">Core Business Logic</text>
+
+                <rect x="95" y="255" width="145" height="52" rx="4" fill="white" stroke="#93c5fd"/>
+                <text x="167" y="275" text-anchor="middle" fill="#1e40af" font-size="10.5" font-weight="600">LibraryManager</text>
+                <text x="167" y="290" text-anchor="middle" fill="#64748b" font-size="9">registry, lifecycle</text>
+
+                <rect x="255" y="255" width="145" height="52" rx="4" fill="white" stroke="#93c5fd"/>
+                <text x="327" y="275" text-anchor="middle" fill="#1e40af" font-size="10.5" font-weight="600">Indexer</text>
+                <text x="327" y="290" text-anchor="middle" fill="#64748b" font-size="9">SHA-256, sync</text>
+
+                <rect x="415" y="255" width="145" height="52" rx="4" fill="white" stroke="#93c5fd"/>
+                <text x="487" y="275" text-anchor="middle" fill="#1e40af" font-size="10.5" font-weight="600">ChromaDBOrchestrator</text>
+                <text x="487" y="290" text-anchor="middle" fill="#64748b" font-size="9">connections, search</text>
+
+                <rect x="575" y="255" width="130" height="52" rx="4" fill="white" stroke="#93c5fd"/>
+                <text x="640" y="275" text-anchor="middle" fill="#1e40af" font-size="10.5" font-weight="600">LibraryStatus</text>
+                <text x="640" y="290" text-anchor="middle" fill="#64748b" font-size="9">atomic updates</text>
+
+                <!-- Backend Layer -->
+                <rect x="80" y="330" width="640" height="75" rx="6" fill="#faf5ff" stroke="#c4b5fd" stroke-width="1.5"/>
+                <text x="400" y="349" text-anchor="middle" fill="#5b21b6" font-size="12" font-weight="bold">Backend Layer</text>
+
+                <rect x="180" y="355" width="200" height="38" rx="4" fill="white" stroke="#c4b5fd"/>
+                <text x="280" y="379" text-anchor="middle" fill="#5b21b6" font-size="10.5" font-weight="600">ChonkieBackend</text>
+
+                <rect x="420" y="355" width="200" height="38" rx="4" fill="white" stroke="#c4b5fd"/>
+                <text x="520" y="379" text-anchor="middle" fill="#5b21b6" font-size="10.5" font-weight="600">ChromaBackend</text>
+
+                <!-- Storage boxes at bottom -->
+                <line x1="200" y1="420" x2="200" y2="445" stroke="#6ee7b7" stroke-width="2" marker-end="url(#arrowhead)"/>
+                <line x1="400" y1="420" x2="400" y2="445" stroke="#6ee7b7" stroke-width="2" marker-end="url(#arrowhead)"/>
+                <line x1="600" y1="420" x2="600" y2="445" stroke="#f4a261" stroke-width="2" marker-end="url(#arrowhead)"/>
+
+                <rect x="120" y="455" width="160" height="50" rx="6" fill="#d1fae5" stroke="#6ee7b7" stroke-width="1.5"/>
+                <text x="200" y="476" text-anchor="middle" fill="#065f46" font-size="10.5" font-weight="600">botany/</text>
+                <text x="200" y="492" text-anchor="middle" fill="#065f46" font-size="9">└── .librarian/chromadb</text>
+
+                <rect x="320" y="455" width="160" height="50" rx="6" fill="#d1fae5" stroke="#6ee7b7" stroke-width="1.5"/>
+                <text x="400" y="476" text-anchor="middle" fill="#065f46" font-size="10.5" font-weight="600">peter-health/</text>
+                <text x="400" y="492" text-anchor="middle" fill="#065f46" font-size="9">└── .librarian/chromadb</text>
+
+                <rect x="520" y="455" width="160" height="50" rx="6" fill="#ffedd5" stroke="#f4a261" stroke-width="1.5"/>
+                <text x="600" y="476" text-anchor="middle" fill="#9a3412" font-size="10.5" font-weight="600">/home/peter/.librarian/</text>
+                <text x="600" y="492" text-anchor="middle" fill="#9a3412" font-size="9">(Reports only)</text>
+
+                <!-- Defs -->
+                <defs>
+                    <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+                        <polygon points="0 0, 10 3.5, 0 7" fill="#4cc9f0"/>
+                    </marker>
+                </defs>
+            </svg>
+            <p class="diagram-caption">Figure 1: System architecture — three server modes share core logic, each library has its own ChromaDB instance.</p>
+        </div>
+
+        <!-- ──────────────────────────────────────────────────────── -->
+        <!--  §3  Request Lifecycle                                   -->
+        <!-- ──────────────────────────────────────────────────────── -->
+        <h2 id="lifecycle">3. Request Lifecycle</h2>
+
+        <h3>Semantic Search Request</h3>
+        <div class="diagram" style="font-family: monospace; font-size: 0.88rem; line-height: 1.9;">
+            MCP Client → <span class="flow-box">search_library(query="plant taxonomy", library="botany", limit=10)</span>
+            <span class="flow-arrow">↓</span>
+            <span class="flow-box">librarian_mcp.py</span> → FastMCP routes to <span class="flow-box">library_tools.search_library()</span>
+            <span class="flow-arrow">↓</span>
+            Get <span class="flow-box flow-box-core">ChromaDBOrchestrator</span> (lazy singleton)<br>
+            Clear cached connection for "botany" (force fresh HNSW load)<br>
+            Create <span class="flow-box">PersistentClient</span> at botany/.librarian/chromadb/<br>
+            Get collection "botany" (cosine similarity space)
+            <span class="flow-arrow">↓</span>
+            <span class="flow-box">collection.query(query_texts=["plant taxonomy"], n_results=10)</span><br>
+            <span class="pipe">└──</span> ChromaDB embeds query → finds nearest vectors
+            <span class="flow-arrow">↓</span>
+            <span class="flow-box flow-box-backend">_format_results()</span>: Convert distance → similarity (<code>1 - distance</code>)<br>
+            <span class="pipe">└──</span> Filter <code>None</code> results (stale HNSW entries)<br>
+            <span class="pipe">└──</span> Return sorted by score (descending, higher = better)
+        </div>
+
+        <h3>Add Library Request</h3>
+        <div class="diagram" style="font-family: monospace; font-size: 0.88rem; line-height: 1.9;">
+            MCP Client → <span class="flow-box">add_library(source_path="/home/peter/botany", library_name="botany")</span>
+            <span class="flow-arrow">↓</span>
+            Validate source_path exists<br>
+            <span class="flow-box flow-box-core">LibraryManager.register_library()</span>
+            <span class="pipe">├──</span> Create .librarian/ directory structure<br>
+            <span class="pipe">├──</span> Create delivery/ directory (for report output)<br>
+            <span class="pipe">├──</span> Create .librarianignore (default excludes)<br>
+            <span class="pipe">├──</span> Create .stignore (Syncthing exclusions)<br>
+            <span class="pipe">├──</span> Create config.yaml with defaults<br>
+            <span class="pipe">├──</span> Initialize ChromaDB (create collection)<br>
+            <span class="pipe">└──</span> Add to registry (libraries.yaml)
+            <span class="flow-arrow">↓</span>
+            Set active flag (<span class="flow-box flow-box-core">LibraryStatus.set_active(True)</span>)
+            <span class="flow-arrow">↓</span>
+            Spawn <span class="flow-box flow-box-backend">sync_worker.py</span> as subprocess (stdout/stderr → DEVNULL)<br>
+            <span class="pipe">├──</span> Worker runs independently in background<br>
+            <span class="pipe">├──</span> Worker logs to .librarian/sync_worker.log<br>
+            <span class="pipe">└──</span> Return immediately: <em>"Library sync started"</em>
+        </div>
+
+        <!-- ──────────────────────────────────────────────────────── -->
+        <!--  §4  Source Code Reference                                -->
+        <!-- ──────────────────────────────────────────────────────── -->
+        <h2 id="source-code">4. Source Code Reference</h2>
+
+        <h3>Entry Point</h3>
+
+        <h4><code>mcp_server/librarian_mcp.py</code> — Server entry point</h4>
+        <p>
+            Creates FastMCP server, registers tools, handles transport selection.
+            Parses CLI args (<code>--transport</code>, <code>--port</code>, <code>--host</code>, <code>--mode</code>)
+            and reads <code>LIBRARIAN_*</code> environment variables.
+            Modes: Admin (default), LibraryManager, LibraryUser.
+        </p>
+
+        <h3>Core Components (<code>mcp_server/core/</code>)</h3>
+
+        <h4><code>library_manager.py</code> — Library registry and lifecycle</h4>
+        <ul>
+            <li>Registry path: <code>&lt;project&gt;/global_control/.library_control/libraries.yaml</code></li>
+            <li><code>register_library()</code> — Creates <code>.librarian/</code> structure, <code>delivery/</code> directory, default <code>.librarianignore</code> and <code>.stignore</code>, initializes ChromaDB, adds to registry</li>
+            <li><code>unregister_library()</code> — Removes from registry, deletes <code>.librarian/</code> (NOT source files)</li>
+            <li><code>get_library()</code> / <code>list_libraries()</code> / <code>get_library_config()</code></li>
+            <li>YAML with atomic write (temp + rename) throughout</li>
+        </ul>
+
+        <h4><code>indexer.py</code> — File discovery, change detection, indexing coordination</h4>
+        <ul>
+        <li><code>index_library()</code> — Main indexing loop (incremental sync)
+        <ul>
+        <li>Loads <code>metadata/index.json</code> (SHA-256 checksums, document IDs)</li>
+        <li>Discovers files via <code>_discover_files()</code> with <code>.librarianignore</code> support</li>
+        <li>First pass: checksum comparison → new/changed/skipped</li>
+        <li>Cleanup phase: delete chunks for deleted files (<code>[DELETE]</code>) and updated files (<code>[UPDATE]</code>)</li>
+        <li>Second pass: batch process changed files through ChonkieBackend</li>
+            <li>Returns: <code>{added, updated, skipped, deleted, errors}</code></li>
+            </ul>
+        </li>
+            <li><code>reindex_library()</code> — Full rebuild (clears ChromaDB + metadata first)</li>
+        </ul>
+
+        <h4><code>chromadb_orchestrator.py</code> — Per-library ChromaDB connections and search</h4>
+        <ul>
+            <li><code>get_connection()</code> — Get/create PersistentClient (cached in dict)</li>
+            <li><code>search_library()</code> — Queries collection, converts distance → similarity (<code>1 - distance</code>), filters None results</li>
+            <li><code>search_all_libraries()</code> — Sequential search, aggregate, re-rank by score</li>
+            <li><code>get_library_chunks()</code> — Retrieve all chunks for keyword search</li>
+            <li><code>_format_results()</code> — Standardized format: <code>{content, metadata, score, library}</code></li>
+        </ul>
+
+        <h4><code>library_status.py</code> — Atomic status updates</h4>
+        <p>Status stored in <code>.librarian/config.yaml</code> under <code>status:</code> key. Provides <code>set_active()</code>, <code>is_active()</code>, <code>update_sync_time()</code>, <code>get_status()</code>.</p>
+
+        <h4><code>ignore_patterns.py</code> — .librarianignore pattern matching</h4>
+        <p>Loads gitignore-style patterns from <code>{library_root}/.librarianignore</code>. Used by Indexer to skip files during discovery.</p>
+
+        <h3>Backend Components (<code>mcp_server/backend/</code>)</h3>
+
+        <h4><code>chonkie_backend.py</code> — Semantic chunking + ChromaDB storage</h4>
+        <ul>
+            <li>Extends ChromaBackend. Query, delete, and stats methods are disabled (raises <code>NotImplementedError</code>). Pure insert-only — all chunk deletion is handled by the Indexer.</li>
+            <li><code>__init__()</code> pre-loads <code>minishlab/potion-base-32M</code> with <code>force_download=False</code>, wraps in <code>Model2VecEmbeddings</code>, passes to SemanticChunker. Default chunk_size: 512 tokens.</li>
+            <li><code>chunk_files()</code> — File-type-aware processing:
+                <ul>
+                    <li>Text (<code>.md</code>, <code>.txt</code>, <code>.rst</code>, <code>.log</code>) → read and chunk</li>
+                    <li>Code (<code>.py</code>, <code>.js</code>, <code>.ts</code>, <code>.sh</code>, <code>.bash</code>, <code>.zsh</code>) → read and chunk</li>
+                    <li>Config (<code>.json</code>, <code>.yaml</code>, <code>.yml</code>, <code>.toml</code>) → read and chunk</li>
+                    <li><strong>HTML (<code>.html</code>)</strong> → convert to Markdown via <code>html2text</code> (links preserved, images skipped, no wrapping), then chunk</li>
+                    <li>Binary → rejected with warning</li>
+                </ul>
+            </li>
+            <li><code>get_backend_info()</code> — Returns backend configuration and supported extensions</li>
+        </ul>
+
+        <h4><code>chroma_backend.py</code> — Base ChromaDB operations</h4>
+        <p>Connection management, <code>add_documents()</code>, <code>delete_documents()</code>, <code>get_stats()</code>.</p>
+
+        <h4><code>factory.py</code> — Backend creation</h4>
+
+        <h3>Configuration (<code>mcp_server/config/</code>)</h3>
+
+        <h4><code>settings.py</code> — System settings singleton</h4>
+        <p>Defines <code>PROJECT_ROOT</code>, <code>LIBRARIAN_HOME</code>, <code>LIBRARY_REGISTRY</code>, default chunk size, extensions, timeouts. Environment overrides via <code>LIBRARIAN_*</code> prefix.</p>
+
+        <h4><code>config_loader.py</code> — YAML configuration loading</h4>
+        <p><code>load_global_config()</code>, <code>load_library_config()</code>, <code>load_libraries_registry()</code>, atomic writes for config and registry.</p>
+
+        <h4><code>server_mode.py</code> — Tool set definitions per mode</h4>
+        <p><code>LIBRARYMANAGER_TOOLS</code> (18), <code>LIBRARYUSER_TOOLS</code> (14), <code>ADMIN_TOOLS</code> (all + admin_command).</p>
+
+        <h4><code>librarian_prompt.py</code> — System prompt for LLM persona</h4>
+
+        <h3>Tools (<code>mcp_server/tools/</code>)</h3>
+
+        <h4><code>library_tools.py</code> — All 22+ MCP tools + security validation</h4>
+        <p>The largest file in the codebase. Contains constants (command whitelists, banned flags, document extensions), helper functions (<code>is_safe_command()</code>, <code>is_library_path()</code>, <code>is_admin_path()</code>, <code>is_safe_admin_command()</code>, <code>truncate_output()</code>), and tool registration via <code>conditional_tool()</code> decorator that filters by server mode.</p>
+
+        <h4><code>keyword_search.py</code> — Text matching engine</h4>
+        <p>Simple substring matching across chunks. Counts occurrences per chunk, sorts by match count (descending).</p>
+
+        <!-- ──────────────────────────────────────────────────────── -->
+        <!--  §5  Scripts                                              -->
+        <!-- ──────────────────────────────────────────────────────── -->
+        <h2 id="scripts">5. Scripts</h2>
+
+        <h3>Active Scripts</h3>
+
+        <h4><code>scripts/sync_worker.py</code> — Background sync/rebuild process</h4>
+        <ul>
+            <li>Run as subprocess by <code>add_library</code>, <code>sync_library_async</code>, <code>rebuild_library_async</code></li>
+            <li>Creates its own PersistentClient (separate from MCP server)</li>
+            <li>Loads model with <code>force_download=False</code> (cached)</li>
+            <li>Incremental sync: SHA-256 checksums detect changes</li>
+            <li>Deletion detection: finds indexed files not on disk, removes from ChromaDB</li>
+            <li>Logs to <code>{library}/.librarian/sync_worker.log</code></li>
+            <li>Sets active flag True at start, clears in <code>finally</code> block</li>
+        </ul>
+
+        <h3>Startup Scripts</h3>
+        <ul>
+            <li><code>start_multi_mode.sh</code> — Starts LibraryManager (8889), LibraryUser (8890), Admin (8891). PID files in <code>/tmp/</code>, health check after 5 seconds.</li>
+            <li><code>stop_multi_mode.sh</code> — Graceful shutdown by PID, then force kill after 5 sec, final sweep by port.</li>
+        </ul>
+
+        <!-- ──────────────────────────────────────────────────────── -->
+        <!--  §6  Configuration                                        -->
+        <!-- ──────────────────────────────────────────────────────── -->
+        <h2 id="configuration">6. Configuration System</h2>
+
+        <h3>Configuration Hierarchy (highest priority first)</h3>
+        <ol>
+            <li><strong>Environment variables</strong> — <code>LIBRARIAN_*</code> prefix</li>
+            <li><strong>Library config</strong> — <code>&lt;library&gt;/.librarian/config.yaml</code></li>
+            <li><strong>Global config</strong> — <code>&lt;project&gt;/global_control/.library_control/config.yaml</code></li>
+            <li><strong>Code defaults</strong> — <code>mcp_server/config/settings.py</code></li>
+        </ol>
+
+        <h3>Key Environment Variables</h3>
+        <table>
+            <thead><tr><th>Variable</th><th>Default</th><th>Purpose</th></tr></thead>
+            <tbody>
+                <tr><td><code>LIBRARIAN_SERVER_MODE</code></td><td><code>Admin</code></td><td>Server mode (Admin/LibraryManager/LibraryUser)</td></tr>
+                <tr><td><code>LIBRARIAN_TRANSPORT</code></td><td><code>http</code></td><td>Transport protocol (stdio/http)</td></tr>
+                <tr><td><code>LIBRARIAN_PORT</code></td><td><code>8000</code></td><td>HTTP port</td></tr>
+                <tr><td><code>LIBRARIAN_HOST</code></td><td><code>0.0.0.0</code></td><td>HTTP host</td></tr>
+                <tr><td><code>LIBRARIAN_BACKEND</code></td><td><code>chonkie</code></td><td>Backend type</td></tr>
+                <tr><td><code>LIBRARIAN_HOME</code></td><td><code>~/.librarian</code></td><td>Report write location</td></tr>
+                <tr><td><code>LIBRARIAN_CHUNK_SIZE</code></td><td><code>1000</code></td><td>Chunk size in tokens</td></tr>
+            </tbody>
+        </table>
+
+        <h3>Library Config Template</h3>
+        <pre><code><span class="comment"># &lt;library&gt;/.librarian/config.yaml</span>
+<span class="keyword">library</span>:
+  <span class="keyword">name</span>: botany
+  <span class="keyword">path</span>: /home/peter/botany
+  <span class="keyword">description</span>: Botany research library
+  <span class="keyword">created_at</span>: <span class="string">"2026-04-12T..."</span>
+
+<span class="keyword">indexing</span>:
+  <span class="keyword">enabled</span>: <span class="type">true</span>
+  <span class="keyword">file_types</span>:
+    - {<span class="keyword">pattern</span>: <span class="string">"*.md"</span>,  <span class="keyword">description</span>: <span class="string">"Markdown documents"</span>, <span class="keyword">action</span>: index}
+    - {<span class="keyword">pattern</span>: <span class="string">"*.txt"</span>,  <span class="keyword">description</span>: <span class="string">"Text files"</span>,        <span class="keyword">action</span>: index}
+    - {<span class="keyword">pattern</span>: <span class="string">"*.py"</span>,   <span class="keyword">description</span>: <span class="string">"Python code"</span>,       <span class="keyword">action</span>: index}
+    - {<span class="keyword">pattern</span>: <span class="string">"*.sh"</span>,   <span class="keyword">description</span>: <span class="string">"Shell scripts"</span>,     <span class="keyword">action</span>: index}
+    - {<span class="keyword">pattern</span>: <span class="string">"*.yaml"</span>, <span class="keyword">description</span>: <span class="string">"YAML configuration"</span>, <span class="keyword">action</span>: index}
+    - {<span class="keyword">pattern</span>: <span class="string">"*.yml"</span>,  <span class="keyword">description</span>: <span class="string">"YAML configuration"</span>, <span class="keyword">action</span>: index}
+    - {<span class="keyword">pattern</span>: <span class="string">"*.html"</span>, <span class="keyword">description</span>: <span class="string">"HTML documents"</span>,    <span class="keyword">action</span>: index}
+  <span class="keyword">ignore_file</span>: .librarianignore
+
+<span class="keyword">chromadb</span>:
+  <span class="keyword">path</span>: .librarian/chromadb
+  <span class="keyword">collection_name</span>: botany
+  <span class="keyword">embedding_model</span>: BAAI/bge-small-en-v1.5</code></pre>
+
+        <!-- ──────────────────────────────────────────────────────── -->
+        <!--  §7  Library Structure                                     -->
+        <!-- ──────────────────────────────────────────────────────── -->
+        <h2 id="library-structure">7. Library Structure</h2>
+
+        <p>Each registered library has this structure:</p>
+        <div class="file-tree">
+            <span class="dir">{library_root}/</span><br>
+            ├── <span class="dir">.librarian/</span><br>
+            │   ├── <span class="file">config.yaml</span>          <span class="comment"># Library configuration</span><br>
+            │   ├── <span class="dir">chromadb/</span>            <span class="comment"># Per-library ChromaDB instance</span><br>
+            │   │   └── <span class="file">chroma.sqlite3</span>   <span class="comment"># Vector data</span><br>
+            │   ├── <span class="dir">metadata/</span><br>
+            │   │   └── <span class="file">index.json</span>       <span class="comment"># SHA-256 checksums, document IDs</span><br>
+            │   ├── <span class="dir">status/</span>              <span class="comment"># Status indicator files</span><br>
+            │   ├── <span class="file">sync_worker.log</span>      <span class="comment"># Worker log (from last sync/rebuild)</span><br>
+            │   ├── <span class="file">sync_progress.json</span>   <span class="comment"># Sync progress (operation, %, timestamp)</span><br>
+            │   └── <span class="file">sync_results.json</span>    <span class="comment"># Sync results (added, updated, skipped, deleted)</span><br>
+            ├── <span class="dir">delivery/</span>                <span class="comment"># MCP report output (synced to remote devices via Syncthing)</span><br>
+            ├── <span class="file">.librarianignore</span>         <span class="comment"># Exclude patterns (auto-created, gitignore-style)</span><br>
+            ├── <span class="file">.stignore</span>                <span class="comment"># Syncthing exclusions (auto-created, excludes .librarian/)</span><br>
+            └── <span class="file">{source documents}</span>     <span class="comment"># Actual indexed files</span><br>
+        </div>
+
+        <h3>Global Control Directory</h3>
+        <div class="file-tree">
+            <span class="dir">{project_root}/global_control/</span><br>
+            └── <span class="dir">.library_control/</span><br>
+                ├── <span class="file">config.yaml</span>    <span class="comment"># Global configuration</span><br>
+                └── <span class="file">libraries.yaml</span> <span class="comment"># Library registry (all registered libraries)</span>
+        </div>
+
+        <!-- ──────────────────────────────────────────────────────── -->
+        <!--  §8  Multi-Mode                                           -->
+        <!-- ──────────────────────────────────────────────────────── -->
+        <h2 id="multi-mode">8. Multi-Mode Operation</h2>
+
+        <p>Three server modes with different tool sets. Each runs as a separate process.</p>
+
+        <table>
+            <thead><tr><th>Mode</th><th>Port</th><th>Tools</th><th>Purpose</th></tr></thead>
+            <tbody>
+                <tr><td><span class="badge badge-blue">LibraryManager</span></td><td>8889</td><td>18</td><td>Library administration + search + CLI</td></tr>
+                <tr><td><span class="badge badge-green">LibraryUser</span></td><td>8890</td><td>14</td><td>Search, browse, write reports (no library mgmt)</td></tr>
+                <tr><td><span class="badge badge-purple">Admin</span></td><td>8891</td><td>All (22+)</td><td>Full system control + admin_command</td></tr>
+            </tbody>
+        </table>
+
+        <p>Mode selection via <code>LIBRARIAN_SERVER_MODE</code> env var or <code>--mode</code> CLI arg. Tool filtering uses <code>conditional_tool()</code> decorator — tools not in the mode's set are simply not registered with FastMCP.</p>
+
+        <h3>Tool Availability Matrix</h3>
+        <table>
+            <thead><tr><th>Tool</th><th style="text-align:center">LibraryUser</th><th style="text-align:center">LibraryManager</th><th style="text-align:center">Admin</th></tr></thead>
+            <tbody>
+                <tr><td>search_library</td><td style="text-align:center">✅</td><td style="text-align:center">✅</td><td style="text-align:center">✅</td></tr>
+                <tr><td>search_library_keyword</td><td style="text-align:center">✅</td><td style="text-align:center">✅</td><td style="text-align:center">✅</td></tr>
+                <tr><td>search_across_libraries</td><td style="text-align:center">✅</td><td style="text-align:center">✅</td><td style="text-align:center">✅</td></tr>
+                <tr><td>list_libraries</td><td style="text-align:center">✅</td><td style="text-align:center">✅</td><td style="text-align:center">✅</td></tr>
+                <tr><td>get_library_stats</td><td style="text-align:center">✅</td><td style="text-align:center">✅</td><td style="text-align:center">✅</td></tr>
+                <tr><td>list_library_documents</td><td style="text-align:center">✅</td><td style="text-align:center">✅</td><td style="text-align:center">✅</td></tr>
+                <tr><td>read_library_document</td><td style="text-align:center">✅</td><td style="text-align:center">✅</td><td style="text-align:center">✅</td></tr>
+                <tr><td>execute_command</td><td style="text-align:center">✅</td><td style="text-align:center">✅</td><td style="text-align:center">✅</td></tr>
+                <tr><td>read_document</td><td style="text-align:center">✅</td><td style="text-align:center">✅</td><td style="text-align:center">✅</td></tr>
+                <tr><td>list_documents</td><td style="text-align:center">✅</td><td style="text-align:center">✅</td><td style="text-align:center">✅</td></tr>
+                <tr><td>search_documents</td><td style="text-align:center">✅</td><td style="text-align:center">✅</td><td style="text-align:center">✅</td></tr>
+                <tr><td>document_summary</td><td style="text-align:center">✅</td><td style="text-align:center">✅</td><td style="text-align:center">✅</td></tr>
+                <tr><td>write_document</td><td style="text-align:center">✅</td><td style="text-align:center">✅</td><td style="text-align:center">✅</td></tr>
+                <tr><td>server_info</td><td style="text-align:center">✅</td><td style="text-align:center">✅</td><td style="text-align:center">✅</td></tr>
+                <tr><td>add_library</td><td style="text-align:center">❌</td><td style="text-align:center">✅</td><td style="text-align:center">✅</td></tr>
+                <tr><td>delete_library</td><td style="text-align:center">❌</td><td style="text-align:center">✅</td><td style="text-align:center">✅</td></tr>
+                <tr><td>sync_library_async</td><td style="text-align:center">❌</td><td style="text-align:center">✅</td><td style="text-align:center">✅</td></tr>
+                <tr><td>rebuild_library_async</td><td style="text-align:center">❌</td><td style="text-align:center">✅</td><td style="text-align:center">✅</td></tr>
+                <tr><td>admin_command</td><td style="text-align:center">❌</td><td style="text-align:center">❌</td><td style="text-align:center">✅</td></tr>
+            </tbody>
+        </table>
+
+        <!-- ──────────────────────────────────────────────────────── -->
+        <!--  §9  Tool Reference                                       -->
+        <!-- ──────────────────────────────────────────────────────── -->
+        <h2 id="tools">9. Tool Reference</h2>
+
+        <h3>Search Tools</h3>
+
+        <div class="tool-entry">
+            <h4>search_library(query, library, limit=10)</h4>
+            <p>Semantic search within a single library. Returns chunks with similarity scores (higher = better, 1.0 = identical, 0.0 = unrelated). Clears cached ChromaDB connection for fresh results. Filters None results (stale HNSW entries).</p>
+        </div>
+
+        <div class="tool-entry">
+            <h4>search_library_keyword(keyword, library, case_sensitive=False, limit=None)</h4>
+            <p>Exact text matching across all chunks in a library. Retrieves all chunks via <code>get_library_chunks()</code>, filters by substring. Sorts by match count (most matches first).</p>
+        </div>
+
+        <div class="tool-entry">
+            <h4>search_across_libraries(query, limit=10)</h4>
+            <p>Searches all registered libraries sequentially. Aggregates results, re-ranks by score, returns top N.</p>
+        </div>
+
+        <h3>Library Management Tools</h3>
+
+        <div class="tool-entry">
+            <h4>add_library(source_path, library_name, description="")</h4>
+            <p>Registers a new library and starts background indexing. Creates <code>.librarian/</code> structure, <code>delivery/</code> directory, default <code>.librarianignore</code> and <code>.stignore</code>, config.yaml, initializes ChromaDB. Spawns <code>sync_worker.py</code> as background subprocess.</p>
+        </div>
+
+        <div class="tool-entry">
+            <h4>delete_library(library, force=False)</h4>
+            <p>Unregisters library and deletes <code>.librarian/</code> directory. Does <strong>not</strong> delete source documents.</p>
+        </div>
+
+        <div class="tool-entry">
+            <h4>sync_library_async(library)</h4>
+            <p>Incremental sync: SHA-256 checksum comparison. Only changed files are re-indexed. Spawns <code>sync_worker.py</code> in background. Returns immediately.</p>
+        </div>
+
+        <div class="tool-entry">
+            <h4>rebuild_library_async(library)</h4>
+            <p>Full rebuild: clears ChromaDB and metadata, re-indexes everything from scratch. Long-running operation (20-30 minutes for full library).</p>
+        </div>
+
+        <h3>Document Access Tools</h3>
+
+        <div class="tool-entry">
+            <h4>list_library_documents(library, limit=50)</h4>
+            <p>Lists indexed documents with metadata from <code>metadata/index.json</code>.</p>
+        </div>
+
+        <div class="tool-entry">
+            <h4>read_library_document(path, library, max_chars=8000)</h4>
+            <p>Reads a document from within a registered library root. Path is relative to the library root.</p>
+        </div>
+
+        <h3>CLI Tools</h3>
+
+        <div class="tool-entry">
+            <h4>execute_command(command, args=None, cwd=None)</h4>
+            <p>Executes whitelisted commands within library roots. 22 allowed commands (ls, cat, grep, find, head, tail, wc, etc.). Validates path against registered library roots. 15 second timeout, 8000 char output limit.</p>
+        </div>
+
+        <div class="tool-entry">
+            <h4>admin_command(command, args=None, cwd=None) <span class="badge badge-purple">Admin only</span></h4>
+            <p>Expanded whitelist: 27 commands (+ ps, pip, env, printenv, which). Broader path scope: library roots + project source directory. Argument guards block write operations (pip install, ps -k, etc.).</p>
+        </div>
+
+        <div class="tool-entry">
+            <h4>read_document(path, start_line=None, end_line=None, max_chars=8000)</h4>
+            <p>Reads files within allowed directories. Supports head/tail/line-range selection.</p>
+        </div>
+
+        <div class="tool-entry">
+            <h4>list_documents(path=None, extension=None, recursive=True)</h4>
+            <p>Lists documents within a directory path, filtered by supported extensions.</p>
+        </div>
+
+        <div class="tool-entry">
+            <h4>search_documents(query, path=None, extension=None, case_sensitive=False)</h4>
+            <p>Text string search across documents in a directory. Returns matching files and lines with line numbers.</p>
+        </div>
+
+        <div class="tool-entry">
+            <h4>document_summary(path)</h4>
+            <p>Structural summary of a document — headings for markdown, definitions for code, first 10 lines for others.</p>
+        </div>
+
+        <div class="tool-entry">
+            <h4>write_document(path, content, create_dirs=True, library=None)</h4>
+            <p>Writes to <code>{LIBRARIAN_HOME}/{path}</code> sandbox (always). When <code>library</code> is specified, also writes to <code>{library_root}/delivery/{path}</code> — enabling deliverables to sync to remote devices via Syncthing. Path traversal blocked, dangerous patterns blocked. Max 100KB.</p>
+        </div>
+
+        <div class="tool-entry">
+            <h4>server_info()</h4>
+            <p>Returns server configuration, allowed commands, and supported document types.</p>
+        </div>
+
+        <!-- ──────────────────────────────────────────────────────── -->
+        <!--  §10  Data Flow                                           -->
+        <!-- ──────────────────────────────────────────────────────── -->
+        <h2 id="data-flow">10. Data Flow Maps</h2>
+
+        <h3>Sync Data Flow</h3>
+        <div class="diagram" style="font-family: monospace; font-size: 0.85rem; line-height: 1.9;">
+            <span class="flow-box flow-box-core">sync_library_async("botany")</span>
+            <span class="flow-arrow">↓</span>
+            <span class="flow-box">library_tools.py</span>: Set active=True, spawn <span class="flow-box">sync_worker.py</span>
+            <span class="flow-arrow">↓</span>
+            <strong>sync_worker.py</strong> (background subprocess)<br>
+            <span class="pipe">├──</span> LibraryManager.get_library("botany") → registry lookup<br>
+            <span class="pipe">├──</span> Load config.yaml → get chromadb path, collection name<br>
+            <span class="pipe">├──</span> Create <span class="flow-box flow-box-backend">ChonkieBackend</span> (load model from cache)<br>
+            <span class="pipe">└──</span> Create <span class="flow-box flow-box-core">Indexer</span>(manager, backend)
+            <span class="flow-arrow">↓</span>
+            <strong>Indexer.index_library("botany")</strong><br>
+            <span class="pipe">├──</span> Load .librarian/metadata/index.json → existing checksums<br>
+            <span class="pipe">├──</span> _discover_files() → scan disk, apply .librarianignore
+            <span class="flow-arrow">↓</span>
+            <strong>First pass: checksum comparison</strong><br>
+            <span class="pipe">├──</span> Unchanged → skip<br>
+            <span class="pipe">└──</span> New/changed → queue for processing<br>
+            <span class="flow-arrow">↓</span>
+            <strong>Cleanup phase (single ChromaDB connection)</strong><br>
+            <span class="pipe">├──</span> [DELETE] Files removed from disk → remove chunks + metadata<br>
+            <span class="pipe">└──</span> [UPDATE] Files being updated → remove old chunks<br>
+            <span class="flow-arrow">↓</span>
+            <strong>Second pass: batch through backend (pure insert)</strong><br>
+            <span class="pipe">├──</span> For each changed file:<br>
+            <span class="pipe">│   </span>├── Read text from disk (or convert HTML → Markdown)<br>
+            <span class="pipe">│   </span>├── <span class="flow-box flow-box-backend">SemanticChunker</span>.chunk(text) → chunk objects<br>
+            <span class="pipe">│   </span>└── Add new chunks to ChromaDB with metadata<br>
+            <span class="pipe">└──</span> Save metadata (checksums, document_ids) to index.json
+            <span class="flow-arrow">↓</span>
+            <span class="flow-box flow-box-core">LibraryStatus</span>: update sync time, doc/chunk count, set active=False
+        </div>
+
+        <h3>Search Data Flow</h3>
+        <div class="diagram" style="font-family: monospace; font-size: 0.85rem; line-height: 1.9;">
+            <span class="flow-box flow-box-core">search_library("plant taxonomy", "botany", 10)</span>
+            <span class="flow-arrow">↓</span>
+            <span class="flow-box flow-box-core">ChromaDBOrchestrator.search_library()</span>
+            <span class="flow-arrow">↓</span>
+            <span class="pipe">├──</span> clear_connection("botany") → discard cached client<br>
+            <span class="pipe">├──</span> get_connection("botany") → create fresh PersistentClient<br>
+            <span class="pipe">│   </span><span class="pipe">└──</span> botany/.librarian/chromadb/<br>
+            <span class="pipe">├──</span> get_or_create_collection("botany", cosine space)<br>
+            <span class="pipe">├──</span> <span class="flow-box">collection.query(query_texts=["plant taxonomy"], n_results=10)</span><br>
+            <span class="pipe">│   </span><span class="pipe">└──</span> ChromaDB embeds query with BAAI/bge-small-en-v1.5<br>
+            <span class="pipe">│   </span><span class="pipe">└──</span> HNSW index finds 10 nearest vectors
+            <span class="flow-arrow">↓</span>
+            <span class="flow-box flow-box-backend">_format_results()</span><br>
+            <span class="pipe">├──</span> For each result: <code>score = 1 - distance</code> (similarity)<br>
+            <span class="pipe">├──</span> Filter None documents (stale HNSW)<br>
+            <span class="pipe">└──</span> Return [{content, metadata, score, library}, ...]
+        </div>
+
+        <!-- ──────────────────────────────────────────────────────── -->
+        <!--  §11  Security                                            -->
+        <!-- ──────────────────────────────────────────────────────── -->
+        <h2 id="security">11. Security Architecture</h2>
+
+        <p>Seven layers of defense-in-depth:</p>
+
+        <div class="security-layer">
+            <div class="layer-number">1</div>
+            <div class="layer-content">
+                <strong>Dynamic Library Boundary</strong>
+                <p><code>is_library_path()</code> validates paths against registered library roots — not a single SAFE_DIR. Registering a new library automatically extends what the LLM can access.</p>
+            </div>
+        </div>
+
+        <div class="security-layer">
+            <div class="layer-number">2</div>
+            <div class="layer-content">
+                <strong>Admin Path Scope</strong>
+                <p><code>is_admin_path()</code> validates paths against library roots <em>and</em> the project source directory. Only for admin_command.</p>
+            </div>
+        </div>
+
+        <div class="security-layer">
+            <div class="layer-number">3</div>
+            <div class="layer-content">
+                <strong>Command Whitelisting</strong>
+                <p><code>execute_command</code>: 22 allowed commands. <code>admin_command</code>: 27 allowed commands. Both check <code>BANNED_FLAG_COMBOS</code> and <code>DANGEROUS_COMMANDS</code>.</p>
+            </div>
+        </div>
+
+        <div class="security-layer">
+            <div class="layer-number">4</div>
+            <div class="layer-content">
+                <strong>Admin Argument Guards</strong>
+                <p><code>pip install/uninstall/download</code> → BLOCKED. <code>ps -k/-s/--signal</code> → BLOCKED. All admin operations are read-only.</p>
+            </div>
+        </div>
+
+        <div class="security-layer">
+            <div class="layer-number">5</div>
+            <div class="layer-content">
+                <strong>Report Write Sandbox</strong>
+                <p><code>write_document()</code> writes to <code>{LIBRARIAN_HOME}/{path}</code> (always, backward compatible). When the <code>library</code> parameter is provided, also writes to <code>{library_root}/delivery/{path}</code> — delivery path validated to stay within library's delivery directory. Path traversal blocked (<code>..</code>, <code>/</code>, <code>\</code>). Dangerous patterns blocked (password, secret, .env). Max 100KB.</p>
+            </div>
+        </div>
+
+        <div class="security-layer">
+            <div class="layer-number">6</div>
+            <div class="layer-content">
+                <strong>Resource Limits</strong>
+                <p>Command timeout: 15 seconds. Output truncation: 8,000 characters. Max write size: 100KB. Max document size: 10MB.</p>
+            </div>
+        </div>
+
+        <div class="security-layer">
+            <div class="layer-number">7</div>
+            <div class="layer-content">
+                <strong>.librarianignore</strong>
+                <p>Gitignore-style patterns loaded from <code>{library_root}/.librarianignore</code>. Excludes security files (<code>.env</code>, <code>*.key</code>), dependencies (<code>venv/</code>, <code>node_modules/</code>), databases, build artifacts, and OS files.</p>
+            </div>
+        </div>
+
+        <!-- ──────────────────────────────────────────────────────── -->
+        <!--  §12  File Inventory                                      -->
+        <!-- ──────────────────────────────────────────────────────── -->
+        <h2 id="file-inventory">12. File Inventory</h2>
+
+        <h3>Active Source Files (18 Python files)</h3>
+        <div class="file-tree">
+            <span class="dir">mcp_server/</span><br>
+            ├── <span class="file">__init__.py</span>                        <span class="comment"># Package init</span><br>
+            ├── <span class="file">librarian_mcp.py</span>                   <span class="comment"># Server entry point (FastMCP setup)</span><br>
+            ├── <span class="dir">config/</span><br>
+            │   ├── <span class="file">__init__.py</span>                    <span class="comment"># Package init</span><br>
+            │   ├── <span class="file">settings.py</span>                    <span class="comment"># System settings singleton</span><br>
+            │   ├── <span class="file">config_loader.py</span>               <span class="comment"># YAML config loading + env overrides</span><br>
+            │   ├── <span class="file">server_mode.py</span>                 <span class="comment"># Tool sets per mode (3 modes)</span><br>
+            │   ├── <span class="file">librarian_prompt.py</span>            <span class="comment"># System prompt for LLM</span><br>
+            │   └── <span class="file">README.md</span>                      <span class="comment"># Configuration documentation</span><br>
+            ├── <span class="dir">core/</span><br>
+            │   ├── <span class="file">__init__.py</span>                    <span class="comment"># Package init</span><br>
+            │   ├── <span class="file">library_manager.py</span>             <span class="comment"># Library registry and lifecycle</span><br>
+            │   ├── <span class="file">indexer.py</span>                     <span class="comment"># File scanning, SHA-256, sync logic</span><br>
+            │   ├── <span class="file">chromadb_orchestrator.py</span>       <span class="comment"># Per-library ChromaDB + search</span><br>
+            │   ├── <span class="file">library_status.py</span>              <span class="comment"># Atomic status updates</span><br>
+            │   └── <span class="file">ignore_patterns.py</span>            <span class="comment"># .librarianignore matching</span><br>
+            ├── <span class="dir">backend/</span><br>
+            │   ├── <span class="file">__init__.py</span>                    <span class="comment"># Package init</span><br>
+            │   ├── <span class="file">base.py</span>                        <span class="comment"># Abstract backend interface</span><br>
+            │   ├── <span class="file">chroma_backend.py</span>              <span class="comment"># Base ChromaDB operations</span><br>
+            │   ├── <span class="file">chonkie_backend.py</span>             <span class="comment"># Semantic chunking + storage</span><br>
+            │   └── <span class="file">factory.py</span>                     <span class="comment"># Backend creation</span><br>
+            └── <span class="dir">tools/</span><br>
+                ├── <span class="file">__init__.py</span>                    <span class="comment"># Package init</span><br>
+                ├── <span class="file">library_tools.py</span>               <span class="comment"># All 22 MCP tools + security (1561 lines)</span><br>
+                └── <span class="file">keyword_search.py</span>              <span class="comment"># Text matching engine</span>
+        </div>
+
+        <h3>Active Scripts</h3>
+        <div class="file-tree">
+            <span class="dir">scripts/</span><br>
+            └── <span class="file">sync_worker.py</span>                     <span class="comment"># Background sync/rebuild process</span>
+        </div>
+
+        <h3>Startup Scripts</h3>
+        <div class="file-tree">
+            <span class="file">start_multi_mode.sh</span>                    <span class="comment"># Start all 3 server modes</span><br>
+            <span class="file">stop_multi_mode.sh</span>                     <span class="comment"># Stop all servers</span>
+        </div>
+
+        <h3>Documentation</h3>
+        <div class="file-tree">
+            <span class="file">ARCHITECTURE_v2.md</span>                     <span class="comment"># Technical architecture (v3)</span><br>
+            <span class="file">BACKBURNER.md</span>                          <span class="comment"># Deferred features (6 entries, #1 and #5 resolved)</span><br>
+            <span class="file">CHANGELOG.md</span>                           <span class="comment"># Version history</span><br>
+            <span class="file">LICENSE</span>                                <span class="comment"># MIT License</span><br>
+            <span class="file">README.md</span>                              <span class="comment"># User-facing overview</span><br>
+            <span class="file">SYSTEM_REFERENCE.html</span>                  <span class="comment"># This document — authoritative system reference</span><br>
+            <span class="file">system_prompt_librarian.md</span>             <span class="comment"># Librarian persona definition</span><br>
+            <span class="file">system_prompt_librarian+coder.md</span>       <span class="comment"># Librarian+Coder persona definition</span>
+        </div>
+
+        <h3>Global Control</h3>
+        <div class="file-tree">
+            <span class="dir">global_control/.library_control/</span><br>
+            ├── <span class="file">config.yaml</span>                        <span class="comment"># Global configuration</span><br>
+            └── <span class="file">libraries.yaml</span>                     <span class="comment"># Library registry</span>
+        </div>
+
+        <h3>Dead Code (still on disk, excluded from index)</h3>
+        <div class="file-tree">
+            <span class="dead">mcp_server/ai_layer/__init__.py</span>       <span class="comment"># Unused AI abstraction layer</span><br>
+            <span class="dead">scripts/add_license_headers.py</span>         <span class="comment"># Apache license header tool (obsolete)</span><br>
+            <span class="dead">scripts/test_*.py</span>                      <span class="comment"># Old test scripts (5 files)</span><br>
+            <span class="dead">scripts/*.sh</span>                           <span class="comment"># Old utility scripts (~20 files)</span>
+        </div>
+
+    </main>
+</div>
+</body>
+</html>
