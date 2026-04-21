@@ -103,8 +103,8 @@ The medical use case is the focus of this release because chronic disease patien
 Quick summary:
 
 ```bash
-git clone https://github.com/orangelightening/librarian-mcp.git
-cd librarian-mcp
+git clone https://github.com/orangelightening/Chronos-Health-MCP.git
+cd Chronos-Health-MCP
 python3 -m venv venv
 source venv/bin/activate
 pip install -r requirements.txt

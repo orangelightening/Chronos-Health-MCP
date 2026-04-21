@@ -46,8 +46,8 @@ No CUDA, no driver dependencies, no GPU-tier hardware needed.
 ### 1. Clone and Set Up Virtual Environment
 
 ```bash
-git clone https://github.com/orangelightening/librarian-mcp.git
-cd librarian-mcp
+git clone https://github.com/orangelightening/Chronos-Health-MCP.git
+cd Chronos-Health-MCP
 python3 -m venv venv
 source venv/bin/activate
 pip install -r requirements.txt
