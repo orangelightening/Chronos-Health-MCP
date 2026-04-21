@@ -644,6 +644,12 @@ def register_library_tools(mcp, safe_dir: str = None):
             import subprocess
 
             library_manager = get_library_manager()
+
+            # Reject relative paths — they resolve against the server's CWD,
+            # not the user's shell, which creates .librarian/ in the wrong place
+            if not os.path.isabs(source_path):
+                return f"❌ Relative path not allowed: '{source_path}'\n\nUse an absolute path like '/Users/yourname/Documents/my-library' or '/home/yourname/my-library'"
+
             source_path_resolved = Path(source_path).resolve()
 
             # Validate source path exists

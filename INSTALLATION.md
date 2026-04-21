@@ -1,6 +1,6 @@
 # Librarian MCP — Installation & Setup Guide
 
-**Last Updated:** 2026-04-20
+**Last Updated:** 2026-04-21
 **Audience:** Anyone setting up the Librarian MCP system
 
 ---
@@ -24,7 +24,7 @@
 | Requirement | Detail |
 |------------|--------|
 | **Python** | 3.13 or later |
-| **OS** | Linux (Ubuntu 22.04+, Debian 12+). macOS and WSL2 may work but are untested |
+| **OS** | Linux (Ubuntu 22.04+, Debian 12+) or macOS (Apple Silicon M1/M2/M3 tested). WSL2 may work but is untested |
 | **RAM** | 8 GB minimum |
 | **Disk** | ~2 GB for models + space for your libraries' ChromaDB indexes |
 | **GPU** | **Not required.** The system is CPU-optimized by design |
@@ -74,6 +74,50 @@ The server creates `~/.librarian/` on first startup. This is the **central repor
 ├── findings-2026-04-13.md     # Another report
 └── ...
 ```
+
+---
+
+### macOS (Apple Silicon) Prerequisites
+
+On macOS, you need Homebrew and Xcode command line tools installed first.
+
+#### Install Xcode Command Line Tools
+
+```bash
+xcode-select --install
+```
+
+A dialog pops up — click Install. This gives you git and build tools. No Apple Developer account needed.
+
+#### Install Homebrew
+
+```bash
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+```
+
+Homebrew installs to `/opt/homebrew/` on Apple Silicon. It doesn't conflict with the system.
+
+#### Install Python 3.13
+
+```bash
+brew install python@3.13
+```
+
+This installs Python as `python3.13`. Using Homebrew avoids Gatekeeper issues that downloading from python.org would trigger.
+
+#### Clone and Build
+
+```bash
+mkdir -p ~/Projects
+cd ~/Projects
+git clone https://github.com/orangelightening/Chronos-Health-MCP.git
+cd Chronos-Health-MCP
+python3.13 -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
+```
+
+**Note:** On first run, `start_multi_mode.sh` may show failed health checks even though the servers started successfully. This is a timing issue — the model downloads from HuggingFace Hub on first startup (~129 MB), which can take longer than the 5-second health check timeout. The servers are running; just wait a moment and connect your client. Subsequent starts are fast.
 
 ---
 
