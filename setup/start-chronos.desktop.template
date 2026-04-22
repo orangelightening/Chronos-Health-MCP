@@ -1,0 +1,9 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=Start Chronos Health
+Comment=Start the Chronos Health MCP servers
+Exec={{INSTALL_PATH}}/start_multi_mode.sh
+Icon=utilities-terminal
+Terminal=true
+Categories=System;

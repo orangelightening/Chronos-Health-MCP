@@ -1,0 +1,17 @@
+[Unit]
+Description=Chronos Health MCP Server (Multi-Mode)
+After=network.target
+
+[Service]
+Type=forking
+ExecStart={{INSTALL_PATH}}/start_multi_mode.sh
+ExecStop={{INSTALL_PATH}}/stop_multi_mode.sh
+Restart=on-failure
+RestartSec=10
+
+# Logging: journalctl --user -u chronos-health
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=default.target

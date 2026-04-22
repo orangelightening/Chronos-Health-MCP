@@ -10,12 +10,13 @@
 1. [Requirements](#requirements)
 2. [Server Installation](#server-installation)
 3. [Starting the Server](#starting-the-server)
-4. [MCP Client Configuration](#mcp-client-configuration)
-5. [Getting the Demo Libraries Running](#getting-the-demo-libraries-running)
-6. [Creating Your First Library](#creating-your-first-library)
-7. [Managing Libraries](#managing-libraries)
-8. [Directory Structure](#directory-structure)
-9. [Troubleshooting](#troubleshooting)
+4. [Auto-Start & Desktop Shortcuts (Linux)](#auto-start--desktop-shortcuts-linux)
+5. [MCP Client Configuration](#mcp-client-configuration)
+6. [Getting the Demo Libraries Running](#getting-the-demo-libraries-running)
+7. [Creating Your First Library](#creating-your-first-library)
+8. [Managing Libraries](#managing-libraries)
+9. [Directory Structure](#directory-structure)
+10. [Troubleshooting](#troubleshooting)
 
 ---
 
@@ -161,6 +162,45 @@ Server logs are written to `/tmp/librarian-*.log`:
 ```
 
 Per-library sync/rebuild logs are at `{library_root}/.librarian/sync_worker.log`.
+
+---
+
+## Auto-Start & Desktop Shortcuts (Linux)
+
+On Linux, you can install Chronos Health as a **systemd user service** that starts automatically on boot and survives power failures. Desktop shortcuts for start/stop are also available.
+
+### Install
+
+```bash
+cd /path/to/Chronos-Health-MCP
+chmod +x setup/install-service.sh
+./setup/install-service.sh
+```
+
+This creates:
+- A **systemd service** (`chronos-health`) that auto-starts on boot
+- **Desktop shortcuts** — double-click Start/Stop on your desktop
+
+### Managing the Service
+
+```bash
+systemctl --user start chronos-health     # Start
+systemctl --user stop chronos-health      # Stop
+systemctl --user status chronos-health    # Check status
+journalctl --user -u chronos-health -f    # View live logs
+```
+
+### Remove the Service
+
+```bash
+./setup/install-service.sh --remove
+```
+
+Stops the service, removes the systemd file and desktop shortcuts. Your application files are not touched.
+
+See [setup/README.md](setup/README.md) for full details.
+
+> **Other platforms:** macOS and Windows users can achieve similar auto-start behavior using launchd (macOS) or Task Scheduler (Windows). The `setup/` directory provides Linux templates that can be adapted for those platforms.
 
 ---
 

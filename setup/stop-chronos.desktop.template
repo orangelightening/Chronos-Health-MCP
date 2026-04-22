@@ -1,0 +1,9 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=Stop Chronos Health
+Comment=Stop the Chronos Health MCP servers
+Exec={{INSTALL_PATH}}/stop_multi_mode.sh
+Icon=process-stop
+Terminal=true
+Categories=System;
