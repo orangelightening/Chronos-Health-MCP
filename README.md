@@ -76,6 +76,7 @@ The AI can find patterns, retrieve historical context, and show you connections 
 - **🔒 Runs locally** — CPU-based, no cloud, no API keys, no data leaving your machine. Your health records stay on your computer.
 - **⚡ No GPU required** — Static embedding models use lookup tables, not neural network passes. Runs on any standard PC with 8GB RAM.
 - **🛡️ Multi-mode security** — Three server modes with different tool sets. Patients can search and read. Only administrators can manage libraries.
+- **📊 Web dashboard** — Browser-based status page showing servers, libraries, and sync times at a glance. Auto-refreshes every 30 seconds.
 - **🌐 Secure remote access** — Share libraries with family members over a Tailscale tailnet. Your MCP server stays on your machine; clients connect through an encrypted VPN with no ports exposed to the internet.
 - **📦 Distributed libraries (optional)** — Mirror libraries to remote devices using Syncthing over Tailscale. Family members edit their own copy; changes sync back automatically. Reports and deliverables written by the MCP sync to the remote device for local pickup. Tested and working across networks.
 
@@ -187,6 +188,7 @@ Clients connect via localhost on the same machine, or via Tailscale from anywher
 | Component        | Technology                | Purpose                             |
 | ---------------- | ------------------------- | ----------------------------------- |
 | MCP Framework    | FastMCP                   | Tool registration, HTTP transport   |
+| Dashboard        | FastAPI                   | Web status page                     |
 | Vector Database  | ChromaDB                  | Per-library semantic search         |
 | Chunking Engine  | Chonkie (SemanticChunker) | Meaning-aware text splitting        |
 | Chunking Model   | minishlab/potion-base-32M | Static embeddings (CPU-only, 129MB) |
@@ -207,6 +209,9 @@ Everything in LibraryUser, plus library registration, sync, rebuild, and managem
 
 ### Admin (Port 8891) — All Tools
 Full access including system diagnostics. For the technical maintainer.
+
+### Dashboard (Port 8892) — Web Status Page
+A browser-based dashboard showing server status, library status, and sync times at a glance. Auto-refreshes every 30 seconds. Accessible at `http://localhost:8892` or over Tailscale at `http://100.x.y.z:8892`.
 
 **Why three modes?** Smaller tool sets improve AI accuracy. A model picking from 14 tools makes fewer mistakes than one picking from 22+. It's also a security boundary — a family member searching their records can't accidentally restructure the library.
 

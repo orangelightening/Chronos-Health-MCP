@@ -1,7 +1,7 @@
 # Librarian MCP Server — Architecture (Blue Sky v2)
 
 **Version**: 1.0 (Blue Sky)  
-**Date**: 2026-04-12 (v3 — global control path, admin_command, score semantics)  
+**Date**: 2026-04-21 (v4 — dashboard, macOS support, CPU-only requirements)  
 **Status**: Current
 
 ---
@@ -20,6 +20,7 @@ The **Librarian MCP Server** is a Model Context Protocol (MCP) server that enabl
 - ✅ **Text-Only Pipeline** — Only text files indexed, no binary support
 - ✅ **Incremental Sync** — SHA-256 checksum-based change detection
 - ✅ **Multi-Mode Operation** — Three server modes with different tool sets
+- ✅ **Web Dashboard** — Read-only status page showing servers and libraries at a glance
 - ✅ **Semantic Chunking** — Chonkie SemanticChunker for all file types (file-type-aware chunking planned for Release 1.1)
 - ✅ **Distributed Libraries (Optional)** — Syncthing over Tailscale mirrors libraries to remote devices with document delivery
 - ✅ **Unified Cleanup Phase** — Indexer owns all chunk deletion (file deletion + update cleanup)
@@ -37,7 +38,7 @@ The **Librarian MCP Server** is a Model Context Protocol (MCP) server that enabl
                             ▼
 ┌─────────────────────────────────────────────────────────────────┐
 │              Multi-Mode Librarian MCP Servers                   │
-│                   (3 Separate Processes)                        │
+│                   (4 Separate Processes)                        │
 ├─────────────────────────────────────────────────────────────────┤
 │                                                                   │
 │  ┌────────────────┐  ┌────────────────┐  ┌────────────────┐     │
@@ -118,11 +119,67 @@ Three server modes with different tool sets:
 | **Admin** | 8891 | All (incl. admin_command) | Full system control |
 
 **Why Multi-Mode?**
-- Smaller tool sets improve LLM tool selection accuracy (14 vs 22+ tools)
+ - Smaller tool sets improve LLM tool selection accuracy (14 vs 22+ tools)
 - Security: end users can't rebuild libraries or run admin commands
 - Principle of least privilege
 
 **Admin-only tool:** `admin_command` provides expanded command whitelist (`ps`, `pip`, `env`, `printenv`, `which`) with broader path scope (library roots + project source). Argument guards block write operations (`pip install`, `ps -k`, etc.).
+
+---
+
+## Dashboard Architecture
+
+The dashboard is a standalone FastAPI application on port 8892 — separate from the three MCP servers. It serves humans, not AI clients.
+
+```
+┌──────────────┐  ┌──────────────┐
+│   Browser    │  │  MCP Client  │
+│  (human)     │  │  (AI)        │
+└──────┬───────┘  └──────┬───────┘
+       │                 │
+       ▼                 ▼
+┌──────────────┐  ┌──────────────────────┐
+│  Dashboard   │  │  MCP Servers         │
+│  :8892       │  │  :8889 :8890 :8891   │
+│  (FastAPI)   │  │  (FastMCP)           │
+└──────┬───────┘  └──────┬───────────────┘
+       │                 │
+       └────────┬────────┘
+                ▼
+   ┌─────────────────────────┐
+   │  Shared Python Classes  │
+   │  LibraryManager         │
+   │  LibraryStatus          │
+   │  PID files, logs        │
+   └─────────────────────────┘
+```
+
+**Why separate from MCP?**
+- Dashboard serves humans, MCP serves AI clients — different audiences
+- Crash isolation — dashboard restart doesn't affect MCP servers
+- Different lifecycle — can be developed and deployed independently
+- No privilege confusion — dashboard is an observer, not a mode
+
+**Phase 1 (Current — Read-Only):**
+- Server status: running/stopped, port, uptime for all three modes
+- Library status: registered libraries with doc/chunk counts, last sync time
+- Broken library detection
+- Auto-refresh every 30 seconds
+- Accessible at `http://localhost:8892` or `http://100.x.y.z:8892` over Tailscale
+
+**Phase 2 (Planned — Read-Write):**
+- Start/stop server controls
+- Sync/rebuild library triggers
+- Persistence toggle (systemd auto-start)
+
+### Dashboard API Endpoints
+
+| Endpoint | Method | Returns |
+|----------|--------|--------|
+| `/` | GET | Dashboard HTML page |
+| `/api/status` | GET | JSON: servers + libraries combined |
+| `/api/servers` | GET | JSON: server status array |
+| `/api/libraries` | GET | JSON: library status array |
 
 ---
 
@@ -484,6 +541,7 @@ The MCP server listens on localhost ports by default:
 | LibraryManager | 8889 | `http://localhost:8889/mcp` |
 | LibraryUser | 8890 | `http://localhost:8890/mcp` |
 | Admin | 8891 | `http://localhost:8891/mcp` |
+| Dashboard | 8892 | `http://localhost:8892` |
 
 No ports are exposed to external interfaces. The server binds to `127.0.0.1` only.
 
@@ -577,6 +635,7 @@ PDF, DOCX, images, archives, executables. Pre-convert to Markdown before creatin
 | Component | Technology | Purpose |
 |-----------|-----------|---------|
 | MCP Framework | FastMCP | Tool registration and transport |
+| Dashboard | FastAPI | Web status page |
 | Language | Python 3.13 | Core implementation |
 | Vector DB | ChromaDB (per-library) | Semantic search storage |
 | Chunking | Chonkie SemanticChunker | Semantic text splitting (all file types) |
@@ -655,6 +714,14 @@ mcp_server/
 │   └── keyword_search.py     # Text matching for keyword search
 └── ai_layer/
     └── __init__.py           # Unused AI abstraction (dead code, still on disk)
+
+### Dashboard
+```
+dashboard/
+├── app.py                  # FastAPI application (API + serve HTML)
+└── static/
+    ├── index.html           # Dashboard page
+    └── style.css            # Styling
 ```
 
 ### Scripts

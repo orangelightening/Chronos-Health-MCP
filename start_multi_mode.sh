@@ -2,10 +2,11 @@
 #
 # Librarian MCP Multi-Mode Server Startup Script
 #
-# Starts three server instances simultaneously:
+# Starts three server instances plus the dashboard:
 # - LibraryManager mode (18 tools) on port 8889
 # - LibraryUser mode (13 tools) on port 8890
 # - Admin mode (18 tools) on port 8891
+# - Dashboard (read-only status) on port 8892
 
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 cd "$SCRIPT_DIR"
@@ -22,6 +23,7 @@ export PYTHONDONTWRITEBYTECODE=1
 LIBRARYMANAGER_PORT=8889
 LIBRARYUSER_PORT=8890
 ADMIN_PORT=8891
+DASHBOARD_PORT=8892
 
 # Parse arguments
 while [[ $# -gt 0 ]]; do
@@ -29,12 +31,13 @@ while [[ $# -gt 0 ]]; do
         --librarymanager-port) LIBRARYMANAGER_PORT="$2"; shift 2 ;;
         --libraryuser-port) LIBRARYUSER_PORT="$2"; shift 2 ;;
         --admin-port) ADMIN_PORT="$2"; shift 2 ;;
+        --dashboard-port) DASHBOARD_PORT="$2"; shift 2 ;;
         *) echo "Unknown option: $1"; exit 1 ;;
     esac
 done
 
 # Check for running servers
-for mode in LibraryManager LibraryUser Admin; do
+for mode in LibraryManager LibraryUser Admin Dashboard; do
     pid_file="/tmp/librarian-${mode}.pid"
     if [ -f "$pid_file" ] && kill -0 $(cat "$pid_file") 2>/dev/null; then
         echo "Error: ${mode} server already running (PID: $(cat $pid_file))"
@@ -58,6 +61,7 @@ echo "Starting multi-mode Librarian MCP Server..."
 echo "  LibraryManager: http://localhost:${LIBRARYMANAGER_PORT} (18 tools)"
 echo "  LibraryUser:    http://localhost:${LIBRARYUSER_PORT} (13 tools)"
 echo "  Admin:          http://localhost:${ADMIN_PORT} (All tools)"
+echo "  Dashboard:      http://localhost:${DASHBOARD_PORT} (status page)"
 echo ""
 
 # Start LibraryManager
@@ -78,13 +82,18 @@ LIBRARIAN_SERVER_MODE=Admin "$PYTHON_CMD" "${SCRIPT_DIR}/mcp_server/librarian_mc
 echo $! > /tmp/librarian-Admin.pid
 echo "Started Admin (PID: $!)"
 
+# Start Dashboard
+DASHBOARD_PORT=${DASHBOARD_PORT} "$PYTHON_CMD" "${SCRIPT_DIR}/dashboard/app.py" >/tmp/librarian-Dashboard.log 2>&1 &
+echo $! > /tmp/librarian-Dashboard.pid
+echo "Started Dashboard (PID: $!)"
+
 echo ""
 echo "Waiting for servers to start..."
 sleep 5
 
 echo ""
 echo "Health check:"
-for port_info in "${LIBRARYMANAGER_PORT}:LibraryManager" "${LIBRARYUSER_PORT}:LibraryUser" "${ADMIN_PORT}:Admin"; do
+for port_info in "${LIBRARYMANAGER_PORT}:LibraryManager" "${LIBRARYUSER_PORT}:LibraryUser" "${ADMIN_PORT}:Admin" "${DASHBOARD_PORT}:Dashboard"; do
     port="${port_info%%:*}"
     name="${port_info##*:}"
     # Check if port is listening (MCP uses POST, not GET)

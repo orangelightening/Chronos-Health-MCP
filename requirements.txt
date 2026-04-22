@@ -12,5 +12,8 @@ chonkie[semantic,table]>=1.6.0  # Includes all optional dependencies for full fu
 # HTML to Markdown conversion (pre-chunking)
 html2text>=2024.2.26
 
+# Web Dashboard
+fastapi>=0.115.0
+
 # Environment variable management
 python-dotenv>=1.0.0

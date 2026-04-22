@@ -11,12 +11,13 @@
 2. [Server Installation](#server-installation)
 3. [Starting the Server](#starting-the-server)
 4. [Auto-Start & Desktop Shortcuts (Linux)](#auto-start--desktop-shortcuts-linux)
-5. [MCP Client Configuration](#mcp-client-configuration)
-6. [Getting the Demo Libraries Running](#getting-the-demo-libraries-running)
-7. [Creating Your First Library](#creating-your-first-library)
-8. [Managing Libraries](#managing-libraries)
-9. [Directory Structure](#directory-structure)
-10. [Troubleshooting](#troubleshooting)
+5. [Dashboard](#dashboard)
+6. [MCP Client Configuration](#mcp-client-configuration)
+7. [Getting the Demo Libraries Running](#getting-the-demo-libraries-running)
+8. [Creating Your First Library](#creating-your-first-library)
+9. [Managing Libraries](#managing-libraries)
+10. [Directory Structure](#directory-structure)
+11. [Troubleshooting](#troubleshooting)
 
 ---
 
@@ -137,6 +138,7 @@ This starts three server processes:
 | **LibraryUser** | 8890 | 14 | End users, search, browse, reports |
 | **LibraryManager** | 8889 | 18 | Library creation, sync, rebuild |
 | **Admin** | 8891 | All | Full system control including admin commands |
+| **Dashboard** | 8892 | Web page | Read-only status and monitoring |
 
 The script performs a health check and reports status for each mode.
 
@@ -201,6 +203,34 @@ Stops the service, removes the systemd file and desktop shortcuts. Your applicat
 See [setup/README.md](setup/README.md) for full details.
 
 > **Other platforms:** macOS and Windows users can achieve similar auto-start behavior using launchd (macOS) or Task Scheduler (Windows). The `setup/` directory provides Linux templates that can be adapted for those platforms.
+
+---
+
+## Dashboard
+
+The web dashboard provides a single-page view of your Chronos Health system status — servers, libraries, and sync times — accessible from any browser.
+
+### Access
+
+After starting the servers, open a browser to:
+
+```
+http://localhost:8892
+```
+
+On a Tailscale tailnet, use the server's Tailscale IP:
+
+```
+http://100.x.y.z:8892
+```
+
+### What It Shows
+
+- **Servers** — Running/stopped status, port, and uptime for all three MCP modes
+- **Libraries** — Registered libraries with document count, chunk count, and last sync time
+- **Broken libraries** — Libraries with missing paths shown with error details
+
+The page auto-refreshes every 30 seconds. No login required (localhost only).
 
 ---
 

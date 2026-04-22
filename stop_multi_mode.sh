@@ -2,7 +2,7 @@
 #
 # Librarian MCP Multi-Mode Server Stop Script
 #
-# Stops all three server instances started by start_multi_mode.sh
+# Stops all server instances and dashboard started by start_multi_mode.sh
 # Also kills any orphaned librarian_mcp.py processes
 #
 # Usage:
@@ -49,13 +49,14 @@ stop_server() {
 stop_server "LibraryManager" "/tmp/librarian-LibraryManager.pid"
 stop_server "LibraryUser" "/tmp/librarian-LibraryUser.pid"
 stop_server "Admin" "/tmp/librarian-Admin.pid"
+stop_server "Dashboard" "/tmp/librarian-Dashboard.pid"
 
 # Fallback: Kill any remaining librarian_mcp.py processes by port
 echo ""
 echo "Checking for orphaned processes..."
 
-# Check ports 8889, 8890, 8891
-for port in 8889 8890 8891; do
+# Check ports 8889, 8890, 8891, 8892
+for port in 8889 8890 8891 8892; do
     PID=$(lsof -t -i:$port 2>/dev/null | head -1)
     if [ -n "$PID" ]; then
         echo "  Found orphaned process on port $port (PID: $PID), killing..."
@@ -77,3 +78,4 @@ echo "Logs are still available at:"
 echo "  /tmp/librarian-LibraryManager.log"
 echo "  /tmp/librarian-LibraryUser.log"
 echo "  /tmp/librarian-Admin.log"
+echo "  /tmp/librarian-Dashboard.log"

@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chronos Health — Dashboard</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <header>
+        <h1>🏥 Chronos Health</h1>
+        <span id="timestamp" class="timestamp">Loading...</span>
+    </header>
+
+    <main>
+        <!-- Server Status -->
+        <section id="servers-section">
+            <h2>Servers</h2>
+            <div id="servers" class="card-grid">
+                <div class="card loading">Loading...</div>
+            </div>
+        </section>
+
+        <!-- Library Status -->
+        <section id="libraries-section">
+            <h2>Libraries</h2>
+            <div id="libraries">
+                <div class="card loading">Loading...</div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>Auto-refreshes every 30 seconds &middot;
+           <a href="/api/status">API</a> &middot;
+           Port 8892</p>
+    </footer>
+
+    <script>
+        const REFRESH_INTERVAL = 30000; // 30 seconds
+
+        function formatUptime(uptime) {
+            if (!uptime) return '—';
+            return uptime;
+        }
+
+        function renderServers(servers) {
+            const container = document.getElementById('servers');
+            if (!servers || servers.length === 0) {
+                container.innerHTML = '<div class="card"><p>No server data available.</p></div>';
+                return;
+            }
+
+            container.innerHTML = servers.map(s => `
+                <div class="card server-card">
+                    <div class="card-header">
+                        <span class="status-dot ${s.running ? 'green' : 'red'}"></span>
+                        <span class="server-mode">${s.mode}</span>
+                    </div>
+                    <div class="card-body">
+                        <div class="stat-row">
+                            <span class="stat-label">Port</span>
+                            <span class="stat-value">${s.port}</span>
+                        </div>
+                        <div class="stat-row">
+                            <span class="stat-label">Status</span>
+                            <span class="stat-value ${s.running ? 'status-ok' : 'status-stopped'}">
+                                ${s.running ? 'Running' : 'Stopped'}
+                            </span>
+                        </div>
+                        <div class="stat-row">
+                            <span class="stat-label">Uptime</span>
+                            <span class="stat-value">${formatUptime(s.uptime)}</span>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function renderLibraries(libraries) {
+            const container = document.getElementById('libraries');
+            if (!libraries || libraries.length === 0) {
+                container.innerHTML = '<div class="card"><p>No libraries registered.</p></div>';
+                return;
+            }
+
+            container.innerHTML = libraries.map(lib => {
+                if (lib.status === 'broken') {
+                    return `
+                        <div class="card library-card library-broken">
+                            <div class="card-header">
+                                <span class="status-dot red"></span>
+                                <span class="library-name">${lib.name}</span>
+                                <span class="badge badge-error">BROKEN</span>
+                            </div>
+                            <div class="card-body">
+                                <p class="error-message">${lib.error}</p>
+                            </div>
+                        </div>
+                    `;
+                }
+
+                if (lib.status === 'error') {
+                    return `
+                        <div class="card library-card library-error">
+                            <div class="card-header">
+                                <span class="status-dot red"></span>
+                                <span class="library-name">${lib.name}</span>
+                                <span class="badge badge-error">ERROR</span>
+                            </div>
+                            <div class="card-body">
+                                <p class="error-message">${lib.error}</p>
+                            </div>
+                        </div>
+                    `;
+                }
+
+                return `
+                    <div class="card library-card">
+                        <div class="card-header">
+                            <span class="status-dot green"></span>
+                            <span class="library-name">${lib.name}</span>
+                            ${lib.syncing ? '<span class="badge badge-syncing">SYNCING</span>' : ''}
+                        </div>
+                        <div class="card-body">
+                            ${lib.description ? `<p class="library-description">${lib.description}</p>` : ''}
+                            <div class="stat-row">
+                                <span class="stat-label">Documents</span>
+                                <span class="stat-value">${lib.documents !== null ? lib.documents : '—'}</span>
+                            </div>
+                            <div class="stat-row">
+                                <span class="stat-label">Chunks</span>
+                                <span class="stat-value">${lib.chunks !== null ? lib.chunks.toLocaleString() : '—'}</span>
+                            </div>
+                            <div class="stat-row">
+                                <span class="stat-label">Last Sync</span>
+                                <span class="stat-value">${lib.last_sync || 'Never'}</span>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        async function refresh() {
+            try {
+                const response = await fetch('/api/status');
+                if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                const data = await response.json();
+
+                document.getElementById('timestamp').textContent = data.timestamp;
+                renderServers(data.servers);
+                renderLibraries(data.libraries);
+            } catch (err) {
+                document.getElementById('timestamp').textContent = 'Connection error';
+                document.getElementById('servers').innerHTML =
+                    '<div class="card"><p class="error-message">Could not connect to dashboard API. Is the server running?</p></div>';
+                document.getElementById('libraries').innerHTML = '';
+            }
+        }
+
+        // Initial load + auto-refresh
+        refresh();
+        setInterval(refresh, REFRESH_INTERVAL);
+    </script>
+</body>
+</html>
